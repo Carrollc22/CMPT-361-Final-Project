@@ -1,5 +1,6 @@
 Tasks:
 structure repository with all necessary files. (keys, client and server, username and passwords)
 setup connection with forking from the server to allow for multiple connections. 
-allow termination of connection
-divide work on subprotocols 1, 2, and 3 between group 
+Login function with user verification and encryption. 
+allow termination of connection.
+divide work on subprotocols 1, 2, and 3 between group.
