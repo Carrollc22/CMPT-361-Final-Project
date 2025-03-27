@@ -34,6 +34,6 @@ def start_client(server_ip, server_port):
     client_socket.close()
 
 # Run the client
-server_ip = '10.0.0.199' 
+# server_ip = CHANGE TO YOUR DEVICES IP
 server_port = 13000
 start_client(server_ip, server_port)
