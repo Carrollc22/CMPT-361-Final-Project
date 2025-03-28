@@ -1,6 +1,3 @@
-<<<<<<< Updated upstream
-import socket
-=======
 import socket 
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
@@ -33,7 +30,6 @@ def encryption(data, public_key):
     encrypted_data = cipher_rsa.encrypt(data)
     
     return encrypted_data
->>>>>>> Stashed changes
 
 # decryption
 # decrypt the incoming message
@@ -54,13 +50,10 @@ def decryption(encrypted_data, private_key):
 # params: server_ip, server_port. known ip and port addresses to start connection 
 # return: none
 def start_client(server_ip, server_port):
-<<<<<<< Updated upstream
-=======
     # get the server public key form server_public key file
     pem_file = "Client/server_public.pem"
     key = load_key(pem_file)
 
->>>>>>> Stashed changes
     # config socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -71,8 +64,6 @@ def start_client(server_ip, server_port):
 
     welcome_message = client_socket.recv(1024).decode()
 
-<<<<<<< Updated upstream
-=======
     # Login Block
     username = input("Enter your username: ")
     password = input("Enter your password: ")
@@ -87,7 +78,6 @@ def start_client(server_ip, server_port):
         print("Invalid username or password.")
         print("Terminating.")
 
->>>>>>> Stashed changes
     while True:
         # user input
         message = input("You: ")

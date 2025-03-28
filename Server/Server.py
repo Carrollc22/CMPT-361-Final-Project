@@ -1,7 +1,5 @@
 import socket 
 import threading 
-<<<<<<< Updated upstream
-=======
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
 from Crypto.Util.Padding import pad
@@ -57,7 +55,6 @@ def validation(username, password):
     if username in valid_clients and valid_clients[username] == password:
         return True
     return False
->>>>>>> Stashed changes
 
 # Get_server_ip 
 # find the ip of the machine running the server program. Allows for a dynamic ip address when running the server. 
@@ -82,21 +79,14 @@ def get_server_ip():
 # parameters: client_socket. The socket connection between server and client.
 # returns: none
 def handle_client(client_socket, client_address):
-<<<<<<< Updated upstream
-=======
     # AES encryption key
     pem_file = "Server/server_private.pem"
     key = load_key(pem_file)
->>>>>>> Stashed changes
 
     # temporary client handling!!!!!!
 
     client_socket.send(b"Hello from the server!")
 
-<<<<<<< Updated upstream
-    client_message = client_socket.recv(1024).decode("utf-8")
-    print("Received from client: ", client_message)
-=======
     # Receive encrypted data
     encrypted_data = client_socket.recv(1024)
 
@@ -112,7 +102,6 @@ def handle_client(client_socket, client_address):
     else:
         client_socket.send("fail".encode())
         print("The received client information:", username, "is invalid (Connection Terminated).")
->>>>>>> Stashed changes
 
     
     client_socket.close()
