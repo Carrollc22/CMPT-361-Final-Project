@@ -7,6 +7,39 @@ from Crypto.Cipher import PKCS1_OAEP
 import json
 import os
 
+# format_email
+# get user input and format email to send
+# param: username
+# returns: formatted_email
+def format_email(username):
+    # user input
+    destinations = input("Enter destinations (separated by ;): ")
+    title = input("Enter title: ")
+    file_load = input("Would you like to load contents from a file?(Y/N): ")
+    while((file_load != "Y") and (file_load != "N")):
+        file_load = input("Invalid Choice. Would you like to load contents from a file?(Y/N): ")
+    
+    # Get message from existing file
+    if file_load == "Y":
+        send_file = input("Enter filename: ")
+        # ensure file exists
+        if not(os.path.exists(f"Client/{send_file}")):
+            send_file = input("Not an existing file. Enter filename: ")
+        with open(f"Client/{send_file}", 'r') as file:
+                send_content = file.read()
+    
+    elif file_load == "N":
+        send_content = input("Enter message contents: ")
+
+    content_length = len(send_content)
+
+    # format
+    message = f"From: {username}\n" \
+              f"To: {destinations}\n" \
+              f"Title: {title}\n" \
+              f"Content Length: {content_length}\n" \
+              f"Content: {send_content}"
+    return message
 # load_key
 # save the key to a variable from a .pem file
 # param: key_file. The file containing the key
@@ -134,8 +167,21 @@ def start_client(server_ip, server_port):
              
              
             if choice == '1':
-                print("Sending email subprotocol")
-                 
+                # receive confimration server is ready
+                encrypted_confirmation = client_socket.recv(1024)
+                confirmation = decryptionAES(encrypted_confirmation, sym_key)
+                if confirmation != "Send the email":
+                    print("Error")
+                    break
+                
+                # format and encrypt email to send
+                send_email = format_email(username)
+                encrypted_email = encryptionAES(send_email.encode("utf-8"), sym_key)
+                client_socket.send(encrypted_email)
+                
+                # email has been sent
+                print("The message is sent to the server.")
+  
             elif choice == '2':
                 print("Viewing inbox subprotocol")
                  

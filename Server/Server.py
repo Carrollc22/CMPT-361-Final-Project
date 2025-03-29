@@ -7,13 +7,42 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
+import datetime
 import json
 import os
 
-
 MENU = "Select the operation:\n1) Create and send an email\n2) Display the inbox list\n3) Display the email contents\n4) Terminate the connection\nchoice: "
- 
- 
+
+# handle_received_email
+# split the received email into individual components, print confirmation message, and add timestamp
+# param: recv_email
+# return: formatted_email, destinations, title
+def handle_received_email(recv_email):
+    # split by each line
+    lines = recv_email.splitlines()
+    
+    # get components
+    username = lines[0].split(":")[1].strip()  
+    destinations = lines[1].split(":")[1].strip()  
+    title = lines[2].split(":")[1].strip()  
+    content_length = int(lines[3].split(":")[1].strip()) 
+    # rest of message is content
+    content = "\n".join(lines[4:]).strip() 
+
+    # server confirmation 
+    print(f"An email from {username} is sent to {destinations} has a content length of {content_length}")
+
+    current_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+
+    # format with date and time
+    formatted_email = f"From: {username}\n" \
+                      f"To: {destinations}\n" \
+                      f"Time and Date: {current_datetime}\n" \
+                      f"Title: {title}\n" \
+                      f"Content Length: {content_length}\n" \
+                      f"{content}"
+    return formatted_email, destinations, title
+
 # load_key
 # save the key to a variable from a .pem file
 # param: key_file. The file containing the key
@@ -129,16 +158,8 @@ def handle_client(client_socket, client_address):
         sym_key = get_random_bytes(32)
         
         # get user public key for rsa
-        if username == "client1":
-            pem_file = "Server/Client1/client1_public.pem"
-        elif username == "client2":
-            pem_file = "Server/Client2/client2_public.pem"
-        elif username == "client3":
-            pem_file = "Server/Client3/client3_public.pem"
-        elif username == "client4":
-            pem_file = "Server/Client4/client4_public.pem"
-        elif username == "client5":
-            pem_file = "Server/Client5/client5_public.pem"
+        pem_file = f"Server/{username}/{username}_public.pem"
+
         key = load_key(pem_file)
 
         # success 
@@ -168,14 +189,28 @@ def handle_client(client_socket, client_address):
         # receive encrypted choice from client
         encrypted_choice = client_socket.recv(1024)
         choice = decryptionAES(encrypted_choice, sym_key)
- 
+    
         if choice == '1':
-                     
-                # IMPLEMENT SEND EMAIL SUBPROTOCOL
- 
-                print(f"Client {username} selected: Send email")
-                     
-                     
+            # send email protocol
+            # let client know server is ready for email
+            message = encryptionAES("Send the email".encode("utf-8"), sym_key)
+            client_socket.send(message)
+
+            # receive email
+            recv_encrypt_email = client_socket.recv(1024)
+            recv_email = decryptionAES(recv_encrypt_email, sym_key)
+
+            # format and get partial components
+            formatted_email, destinations, title = handle_received_email(recv_email)
+
+            # for each valid recipient of the email write email to file in directory
+            recipients = destinations.split(";")
+            for i in recipients:
+                if os.path.exists(f"Server/{i.strip()}"):
+                    with open(f"Server/{i.strip()}/{username}_{title.replace(' ', '_')}.txt", 'w') as file:
+                        file.write(formatted_email)
+                
+          
         elif choice == '2':
  
             # IMPLEMENT VIEW INBOX SUBPROTOCOL
