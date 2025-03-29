@@ -212,12 +212,43 @@ def handle_client(client_socket, client_address):
                 
           
         elif choice == '2':
- 
-            # IMPLEMENT VIEW INBOX SUBPROTOCOL
- 
+            # Ensure the username's first letter is capitalized
+            username = username.capitalize()  # Capitalizes the first letter, the rest remain as they are
+
+            # Server: Fetch inbox path (using the capitalized username)
+            inbox_path = f'Server/{username}/'  # Now it correctly points to Server/John/ for "john"
+
+            # Check if the inbox exists for the client
+            if os.path.exists(inbox_path):
+                emails = [f for f in os.listdir(inbox_path) if f.endswith('.txt')]  # List .txt files
+
+                if emails:
+                    print(f"Client {username}'s inbox contents: ")
+                    for email in emails:
+                        print(email)
+
+                    # Create a list of email filenames (inbox list)
+                    inbox_list = "\n".join(emails)
+
+                    # Pad the inbox list to match AES block size
+                    padded_inbox_list = pad(inbox_list.encode("utf-8"), AES.block_size)  # Pad properly
+
+                    # Encrypt the padded inbox list
+                    encrypted_inbox = encryptionAES(padded_inbox_list, sym_key)
+
+                    # Send the encrypted inbox list to the client
+                    client_socket.send(encrypted_inbox)
+                else:
+                    # If no emails exist in the inbox
+                    print(f"{username} has no emails.")
+                    client_socket.send("No emails found.".encode())
+            else:
+                # If no inbox folder exists for the client
+                print(f"No inbox was located for {username}.")
+                client_socket.send("No inbox found.".encode())
+
             print(f"Client {username} selected: View inbox")
-                 
-                 
+
         elif choice == '3':
  
             # IMPLEMENT VIEW EMAIL SUBPROTOCOL
@@ -261,11 +292,3 @@ def start_server():
 
 if __name__ == "__main__":
      start_server()
-
-
-
-
-
-
-
-                      

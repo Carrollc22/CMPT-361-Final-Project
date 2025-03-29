@@ -87,6 +87,7 @@ def decryptionRSA(encrypted_data, private_key):
     decrypted_data = cipher_rsa.decrypt(encrypted_data)
     
     # return decoded data
+    unpadded_data = unpad(decrypted_data, AES.block_size)
     return decrypted_data.decode('utf-8')
 
 # decryptionAES
@@ -183,8 +184,18 @@ def start_client(server_ip, server_port):
                 print("The message is sent to the server.")
   
             elif choice == '2':
-                print("Viewing inbox subprotocol")
-                 
+                # Client Side: Receive the encrypted inbox list
+                encrypted_inbox = client_socket.recv(1024)
+
+                # Decrypt the inbox list
+                decrypted_inbox = decryptionAES(encrypted_inbox, sym_key)
+
+                # If decryption is successful, print the inbox list
+                if decrypted_inbox:
+                    print(f"Decrypted inbox list: {decrypted_inbox}")
+                else:
+                    print("Failed to decrypt inbox list.")
+
             elif choice == '3':
  
                 # IMPLEMENT VIEW EMAIL SUBPROTOCOL
