@@ -213,10 +213,10 @@ def handle_client(client_socket, client_address):
           
         elif choice == '2':
             # Ensure the username's first letter is capitalized
-            username = username.capitalize()  # Capitalizes the first letter, the rest remain as they are
+            username = username.capitalize()
 
             # Server: Fetch inbox path (using the capitalized username)
-            inbox_path = f'Server/{username}/'  # Now it correctly points to Server/John/ for "john"
+            inbox_path = f'Server/{username}/'
 
             # Check if the inbox exists for the client
             if os.path.exists(inbox_path):
@@ -230,32 +230,44 @@ def handle_client(client_socket, client_address):
                     # Create a list of email filenames (inbox list)
                     inbox_list = "\n".join(emails)
 
-                    # Pad the inbox list to match AES block size
-                    padded_inbox_list = pad(inbox_list.encode("utf-8"), AES.block_size)  # Pad properly
-
-                    # Encrypt the padded inbox list
-                    encrypted_inbox = encryptionAES(padded_inbox_list, sym_key)
+                    # Encrypt the inbox list (encryptionAES will handle padding)
+                    encrypted_inbox = encryptionAES(inbox_list.encode("utf-8"), sym_key)
 
                     # Send the encrypted inbox list to the client
                     client_socket.send(encrypted_inbox)
                 else:
-                    # If no emails exist in the inbox
-                    print(f"{username} has no emails.")
-                    client_socket.send("No emails found.".encode())
+                    # If no emails exist in the inbox, send an encrypted empty message
+                    empty_message = ""
+                    encrypted_inbox = encryptionAES(empty_message.encode("utf-8"), sym_key)
+                    client_socket.send(encrypted_inbox)
             else:
-                # If no inbox folder exists for the client
-                print(f"No inbox was located for {username}.")
-                client_socket.send("No inbox found.".encode())
+                # If no inbox folder exists for the client, send an encrypted empty message
+                empty_message = ""
+                encrypted_inbox = encryptionAES(empty_message.encode("utf-8"), sym_key)
+                client_socket.send(encrypted_inbox)
 
             print(f"Client {username} selected: View inbox")
 
         elif choice == '3':
- 
-            # IMPLEMENT VIEW EMAIL SUBPROTOCOL
- 
-            print(f"Client {username} selected: View email content")
-                 
-                 
+            ''' Receive and decrypt the inbox list from the server
+            selected_email = input("Enter the full name of the email (with .txt extension) to view: ")
+            encrypted_email_choice = encryptionAES(selected_email.encode('utf-8'), sym_key)
+            client_socket.send(encrypted_email_choice)
+
+            # Server: Fetch the requested email content
+            email_path = f"Server/{username}/{selected_email.strip()}"
+            if os.path.exists(email_path):
+                with open(email_path, 'r') as email_file:
+                    email_content = email_file.read()
+
+                # Encrypt the email content before sending back to the client
+                encrypted_email_content = encryptionAES(email_content.encode('utf-8'), sym_key)
+                client_socket.send(encrypted_email_content)
+                print(f"Server sent email content to client {username}")
+            else:
+                # If email doesn't exist, send failure message
+                client_socket.send("Email not found.".encode()) '''
+
         elif choice == '4':
  
             # terminate connection

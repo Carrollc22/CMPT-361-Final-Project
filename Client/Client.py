@@ -191,22 +191,30 @@ def start_client(server_ip, server_port):
                 decrypted_inbox = decryptionAES(encrypted_inbox, sym_key)
 
                 # If decryption is successful, print the inbox list
-                if decrypted_inbox:
-                    print(f"Decrypted inbox list: {decrypted_inbox}")
+                if decrypted_inbox == "":
+                    # If the decrypted inbox list is empty, it means there are no emails
+                    print("No emails found in the inbox.")
                 else:
-                    print("Failed to decrypt inbox list.")
+                    print(f"Decrypted inbox list: {decrypted_inbox}")
 
             elif choice == '3':
- 
-                # IMPLEMENT VIEW EMAIL SUBPROTOCOL
-                 
-                print("Viewing email subprotocol")
-                 
-            elif choice == '4':
-                print("The connection is terminated with the server.")
-                break
-            else:
-                print("Invalid choice. Please try again.")
+                '''
+                # Let client choose email to view
+                email_choice = input("Enter the full name of the email (with .txt extension) to view: ")
+                encrypted_email_choice = encryptionAES(email_choice.encode('utf-8'), sym_key)
+                client_socket.send(encrypted_email_choice)
+
+                # Receive and decrypt the email content
+                encrypted_email_content = client_socket.recv(1024)
+                email_content = decryptionAES(encrypted_email_content, sym_key)
+
+                # Display the email content
+                if email_content:
+                    print("\nEmail content:")
+                    print(email_content)
+                else:
+                    print("Error: Could not retrieve email content.")'
+                '''
                  
     # Close the client socket
     client_socket.close()
