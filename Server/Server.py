@@ -9,6 +9,9 @@ import hashlib
 import json
 import os
 
+
+MENU = "Select the operation:\n1) Create and send an email\n2) Display the inbox list\n3) Display the email contents\n4) Terminate the connection\nchoice: "
+
 # load_public_key
 # save the key to a variable from a .pem file
 # param: key_file. The file containing the key
@@ -56,6 +59,58 @@ def validation(username, password):
         return True
     return False
 
+
+
+# generate_symmetric_key
+# generate a symmetric key for AES encryption
+# parameters: none
+# returns: sym_key
+def generate_symmetric_key():
+    return os.urandom(32)
+
+# encrypt_with_client_key
+# encrypt data with client's public key
+# parameters: data, client_username
+# returns: encrypted_data
+def encrypt_with_client_key(data, client_username):
+    # load client's public key
+    client_key_path = f"Server/{client_username}_public.pem"
+    client_public_key = load_key(client_key_path)
+    
+    # encrypt with client's public key
+    cipher_rsa = PKCS1_OAEP.new(client_public_key)
+    encrypted_data = cipher_rsa.encrypt(data)
+    
+    return encrypted_data
+
+# encrypt_with_symmetric_key
+# encrypt data with symmetric key
+# parameters: data, sym_key
+# returns: encrypted_data
+def encrypt_with_symmetric_key(data, sym_key):
+    
+    # create AES cipher
+    cipher = AES.new(sym_key, AES.MODE_ECB)
+    
+    # prepare and encrypt data
+    padded_data = pad(data.encode('utf-8'), AES.block_size)
+    encrypted_data = cipher.encrypt(padded_data)
+    
+    return encrypted_data
+
+# decrypt_with_symmetric_key
+# decrypt data with symmetric key
+# parameters: encrypted_data, sym_key
+# returns: decrypted_data
+def decrypt_with_symmetric_key(encrypted_data, sym_key):
+    # create AES cipher
+    cipher = AES.new(sym_key, AES.MODE_ECB)
+    
+    # decrypt and unpad data
+    decrypted_data = unpad(cipher.decrypt(encrypted_data), AES.block_size)
+    
+    return decrypted_data.decode('utf-8')
+
 # Get_server_ip 
 # find the ip of the machine running the server program. Allows for a dynamic ip address when running the server. 
 # Paramaters: none
@@ -97,8 +152,68 @@ def handle_client(client_socket, client_address):
     username, password = decrypted_data.split(',')
 
     if validation(username, password):
+
+        # generate symmetric key
+        sym_key = generate_symmetric_key()
+
+        # encrypt symmetric key with client's public key
+        encrypted_sym_key = encrypt_with_client_key(sym_key, username)
+
+        # send success message
         client_socket.send("success".encode())
+
+        # send the encrypted symmetric key
+        client_socket.send(encrypted_sym_key)
+
         print("Connection Accepted and Symmetric Key Generated for client:", username)
+
+        # receive "OK" message from client
+        encrypted_ok = client_socket.recv(1024)
+        ok_message = decrypt_with_symmetric_key(encrypted_ok, sym_key)
+        print(f"Received acknowledgment: {ok_message}")
+
+        # menu loop
+        while True:
+
+            # encrypt menu and send to client
+            encrypted_menu = encrypt_with_symmetric_key(MENU, sym_key)
+            client_socket.send(encrypted_menu)
+
+            # receive encrypted choice from client
+            encrypted_choice = client_socket.recv(1024)
+            choice = decrypt_with_symmetric_key(encrypted_choice, sym_key)
+
+            if choice == '1':
+                    
+                    # IMPLEMENT SEND EMAIL SUBPROTOCOL
+
+                    print(f"Client {username} selected: Send email")
+                    
+                    
+            elif choice == '2':
+
+                # IMPLEMENT VIEW INBOX SUBPROTOCOL
+
+                print(f"Client {username} selected: View inbox")
+                
+                
+            elif choice == '3':
+
+                # IMPLEMENT VIEW EMAIL SUBPROTOCOL
+
+                print(f"Client {username} selected: View email content")
+                
+                
+            elif choice == '4':
+
+                # terminate connection
+
+                print(f"Terminating connection with {username}.")
+                break
+            else:
+                print(f"Invalid choice received from {username}: {choice}")
+
+
     else:
         client_socket.send("fail".encode())
         print("The received client information:", username, "is invalid (Connection Terminated).")
@@ -118,7 +233,10 @@ def start_server():
 
     # Create a socket and bind to the machine ip and port 13000
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind((server_ip, 13000))  
+
+    # CHANGED TO LOCOALHOST FOR TESTING
+    # SHOULD BE server_ip
+    server_socket.bind(("127.0.0.1", 13000))  
     server_socket.listen(5)
 
     # Accept incoming client connections
@@ -130,7 +248,8 @@ def start_server():
         client_thread = threading.Thread(target=handle_client, args=(client_socket, client_address))
         client_thread.start()
 
-start_server()
+if __name__ == "__main__":
+    start_server()
 
 
 
