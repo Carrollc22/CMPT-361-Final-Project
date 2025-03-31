@@ -132,8 +132,6 @@ def get_server_ip():
     s.close()
     return server_ip
 
-<<<<<<< Updated upstream
-=======
 # handle_send_email
 # send the email to the server
 # params: client_socket, sym_key, username
@@ -291,7 +289,6 @@ def handle_view_email(client_socket, sym_key, username):
 
 
 
->>>>>>> Stashed changes
 # handle_client
 # process of handling client connection. calls subprotocols to handle client requests.
 # parameters: client_socket. The socket connection between server and client.
@@ -350,38 +347,17 @@ def handle_client(client_socket, client_address):
         choice = decryptionAES(encrypted_choice, sym_key)
     
         if choice == '1':
-            # send email protocol
-            # let client know server is ready for email
-            message = encryptionAES("Send the email".encode("utf-8"), sym_key)
-            client_socket.send(message)
-
-            # receive email
-            recv_encrypt_email = client_socket.recv(1024)
-            recv_email = decryptionAES(recv_encrypt_email, sym_key)
-
-            # format and get partial components
-            formatted_email, destinations, title = handle_received_email(recv_email)
-
-            # for each valid recipient of the email write email to file in directory
-            recipients = destinations.split(";")
-            for i in recipients:
-                if os.path.exists(f"Server/{i.strip()}"):
-                    with open(f"Server/{i.strip()}/{username}_{title.replace(' ', '_')}.txt", 'w') as file:
-                        file.write(formatted_email)
+            handle_send_email(client_socket, sym_key, username)    
                 
           
         elif choice == '2':
  
-            # IMPLEMENT VIEW INBOX SUBPROTOCOL
- 
-            print(f"Client {username} selected: View inbox")
+            handle_view_inbox(client_socket, sym_key, username)
                  
                  
         elif choice == '3':
  
-            # IMPLEMENT VIEW EMAIL SUBPROTOCOL
- 
-            print(f"Client {username} selected: View email content")
+            handle_view_email(client_socket, sym_key, username)
                  
                  
         elif choice == '4':

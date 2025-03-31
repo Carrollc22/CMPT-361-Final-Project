@@ -104,6 +104,85 @@ def decryptionAES(encrypted_data, sym_key):
     unpadded_data = unpad(decrypted_data, AES.block_size)
     return unpadded_data.decode('utf-8')
 
+# send_email_subprotocol
+# send the email to the server
+# params: client_socket, sym_key, username
+# return: none
+def send_email_subprotocol(client_socket, sym_key, username):
+        # receive confirmation server is ready
+    encrypted_confirmation = client_socket.recv(1024)
+    confirmation = decryptionAES(encrypted_confirmation, sym_key)
+    if confirmation != "Send the email":
+        print("Error")
+        return
+   
+    # format and encrypt email to send
+    send_email = format_email(username)
+    encrypted_email = encryptionAES(send_email.encode("utf-8"), sym_key)
+    client_socket.send(encrypted_email)
+   
+    # email has been sent
+    print("The message is sent to the server.")
+
+
+# view_inbox_subprotocol
+# view the inbox list from the server
+# params: client_socket, sym_key
+# return: none
+def view_inbox_subprotocol(client_socket, sym_key):
+        # Client Side: Receive the encrypted inbox list
+    encrypted_inbox = client_socket.recv(1024)
+
+
+    # Decrypt the inbox list
+    decrypted_inbox = decryptionAES(encrypted_inbox, sym_key)
+
+
+    # Display the inbox list
+    if decrypted_inbox == "":
+        print("No emails found in the inbox.")
+    else:
+        print(decrypted_inbox)
+
+
+
+
+# view_email_subprotocol
+# view the email content from the server
+# params: client_socket, sym_key
+# return: none
+def view_email_subprotocol(client_socket, sym_key):
+        # Client Side: Receive the encrypted email content
+    encrypted_request = client_socket.recv(1024)
+
+
+    # Decrypt the email content
+    request = decryptionAES(encrypted_request, sym_key)
+
+
+    if request == "the server request email index":
+        # Ask user for input
+        index = input("Enter the email index you wish to view: ")
+
+
+        # Send the users encrypted index to the server
+        encrypted_index = encryptionAES(index.encode("utf-8"), sym_key)
+        client_socket.send(encrypted_index)
+
+
+        # Receive the encrypted email content
+        encrypted_email_content = client_socket.recv(1024)
+
+
+        # Decrypt the email content
+        email_content = decryptionAES(encrypted_email_content, sym_key)
+
+
+        # Display email content
+        print("\n" + email_content)
+    else:
+        print("Unexpected server response: " + request)
+
 # start_client
 # connects to server through known server ip and port
 # params: server_ip, server_port. known ip and port addresses to start connection 
@@ -167,29 +246,14 @@ def start_client(server_ip, server_port):
              
              
             if choice == '1':
-                # receive confimration server is ready
-                encrypted_confirmation = client_socket.recv(1024)
-                confirmation = decryptionAES(encrypted_confirmation, sym_key)
-                if confirmation != "Send the email":
-                    print("Error")
-                    break
-                
-                # format and encrypt email to send
-                send_email = format_email(username)
-                encrypted_email = encryptionAES(send_email.encode("utf-8"), sym_key)
-                client_socket.send(encrypted_email)
-                
-                # email has been sent
-                print("The message is sent to the server.")
+                send_email_subprotocol(client_socket, sym_key, username)
   
             elif choice == '2':
-                print("Viewing inbox subprotocol")
+                view_inbox_subprotocol(client_socket, sym_key)
                  
             elif choice == '3':
  
-                # IMPLEMENT VIEW EMAIL SUBPROTOCOL
-                 
-                print("Viewing email subprotocol")
+                view_email_subprotocol(client_socket, sym_key)
                  
             elif choice == '4':
                 print("The connection is terminated with the server.")
