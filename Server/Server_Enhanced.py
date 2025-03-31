@@ -91,11 +91,14 @@ def encryptionAES(data, sym_key):
 def decryptionRSA(encrypted_data, private_key):
     # extract nonce from message
     nonce = encrypted_data[:16]  
+    print(f"Nonce received: {nonce}")
     # check nonce
     if nonce in received_nonces:
+        print("Nonce is not unique, terminating")
         return "playback attack detected"
     else:
         received_nonces.append(nonce)
+        print("Nonce verified as unique")
 
 
     encrypted_message = encrypted_data[16:]
@@ -118,11 +121,14 @@ def decryptionRSA(encrypted_data, private_key):
 def decryptionAES(encrypted_data, sym_key):
     # extract nonce from message
     nonce = encrypted_data[:16]  
-    #check nonce
+    print(f"Nonce received: {nonce}")
+    # check nonce
     if nonce in received_nonces:
+        print("Nonce is not unique, terminating")
         return "playback attack detected"
     else:
         received_nonces.append(nonce)
+        print("Nonce verified as unique")
     encrypted_message = encrypted_data[16:]
 
 
