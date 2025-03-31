@@ -1,5 +1,4 @@
 import socket 
-import threading 
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
 from Crypto.Util.Padding import pad
@@ -133,6 +132,166 @@ def get_server_ip():
     s.close()
     return server_ip
 
+<<<<<<< Updated upstream
+=======
+# handle_send_email
+# send the email to the server
+# params: client_socket, sym_key, username
+# return: none
+def handle_send_email(client_socket, sym_key, username):
+    # send email protocol
+    # let client know server is ready for email
+    message = encryptionAES("Send the email".encode("utf-8"), sym_key)
+    client_socket.send(message)
+
+    # receive email
+    recv_encrypt_email = client_socket.recv(1024)
+    recv_email = decryptionAES(recv_encrypt_email, sym_key)
+
+    # format and get partial components
+    formatted_email, destinations, title = handle_received_email(recv_email)
+
+    # for each valid recipient of the email write email to file in directory
+    recipients = destinations.split(";")
+    for i in recipients:
+        if os.path.exists(f"Server/{i.strip()}"):
+            with open(f"Server/{i.strip()}/{username}_{title.replace(' ', '_')}.txt", 'w') as file:
+                file.write(formatted_email)
+
+
+# handle_sort_emails
+# sort the emails in the inbox by date and time
+# params: username
+# return: sorted_emails. The list of emails sorted by date and time
+def handle_sort_emails(username):
+
+    # Server: Fetch inbox path (using the capitalized username)
+    inbox_path = f'Server/{username}'
+
+    # Check if the inbox exists for the client
+    if os.path.exists(inbox_path):
+        emails = [f for f in os.listdir(inbox_path) if f.endswith('.txt')]  # List .txt files
+    
+
+    sorted_emails = []
+
+    for file in emails:
+
+        sender = ""
+        date_time = ""
+        title = ""
+        # Extract the email's components
+        with open(os.path.join(inbox_path, file), 'r') as email_file:
+            lines = email_file.readlines()
+            
+            #Parse each line and split at the colon
+            for line in lines:
+                line = line.strip()
+                # Parse From
+                if line.startswith("From: "):
+                    sender = line[line.find(":")+ 1:].strip()
+                # Parse Time and Date
+                elif line.startswith("Time and Date:"):
+                    date_time = line[line.find(":")+1:].strip()
+                # Parse Title
+                elif line.startswith("Title:"):
+                    title = line[line.find(":")+1:].strip()
+
+            sorted_emails = sorted_emails[::-1]
+            
+            # Append to sorted_emails list
+            sorted_emails.append([date_time, sender, title, file])
+
+    return sorted_emails
+
+# handle_view_inbox
+# view the inbox list from the server
+# params: client_socket, sym_key, username
+# return: none
+def handle_view_inbox(client_socket, sym_key, username):
+    
+    # Get sorted emails
+    sorted_emails = handle_sort_emails(username)
+    
+    # Server: Fetch inbox path (using the capitalized username)
+    inbox_path = f'Server/{username}'
+
+    # Check if the inbox exists for the client
+    if os.path.exists(inbox_path):
+        emails = [f for f in os.listdir(inbox_path) if f.endswith('.txt')]  # List .txt files
+
+        if emails:
+            print(f"Client {username}'s inbox contents: ")
+            for email in emails:
+                print(email)
+
+            # Formatted headers for the inbox list
+            headers = "Index\tFrom\t\tDateTime\t\t\tTitle\n"
+            
+            #Format emails with index
+            for i, email in enumerate(sorted_emails, 1):
+                date_time, sender, title, _ = email
+                headers += f"{i}\t{sender}\t\t{date_time}\t{title}\n"
+
+            # Encrypt and send inbox list to the client
+            encrypted_inbox = encryptionAES(headers.encode("utf-8"), sym_key)
+            client_socket.send(encrypted_inbox)
+
+        else:
+            # If no emails exist in the inbox, send an encrypted empty message
+            empty_message = ""
+            encrypted_inbox = encryptionAES(empty_message.encode("utf-8"), sym_key)
+            client_socket.send(encrypted_inbox)
+    else:
+        # If no inbox folder exists for the client, send an encrypted empty message
+        empty_message = ""
+        encrypted_inbox = encryptionAES(empty_message.encode("utf-8"), sym_key)
+        client_socket.send(encrypted_inbox)
+
+
+# handle_view_email
+# view the email content from the server
+# params: client_socket, sym_key, username
+# return: none
+def handle_view_email(client_socket, sym_key, username):
+    # Send request for email index
+    message = encryptionAES("the server request email index".encode("utf-8"), sym_key)
+    client_socket.send(message)
+
+    # Receive the encrypted index from client
+    encrypted_index = client_socket.recv(1024)
+    index = decryptionAES(encrypted_index, sym_key)
+    
+    # Get sorted emails
+    sorted_emails = handle_sort_emails(username)
+    i = int(index) - 1
+
+    if 0 <= i < len(sorted_emails):
+
+        # Get the filename directly from the sorted emails list
+        filename = sorted_emails[i][3]  
+        
+        # Construct path and read file
+        inbox_path = f"Server/{username}"
+        email_file_path = os.path.join(inbox_path, filename)
+        
+        with open(email_file_path, 'r') as file:
+            email_content = file.read()
+        
+        # Encrypt and send email
+        encrypted_content = encryptionAES(email_content.encode("utf-8"), sym_key)
+        client_socket.send(encrypted_content)
+        
+        print(f"Email content sent to client {username}")
+    else:
+        # Invalid index
+        error_message = "Invalid email index"
+        encrypted_error = encryptionAES(error_message.encode("utf-8"), sym_key)
+        client_socket.send(encrypted_error)
+
+
+
+>>>>>>> Stashed changes
 # handle_client
 # process of handling client connection. calls subprotocols to handle client requests.
 # parameters: client_socket. The socket connection between server and client.
@@ -244,20 +403,30 @@ def start_server():
     server_ip = get_server_ip()
 
     print("The server is ready to accept connections")
-
+    print(server_ip)
     # Create a socket and bind to the machine ip and port 13000
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(("127.0.0.1", 13000))  
+    server_socket.bind((server_ip, 13000))  
     server_socket.listen(5)
 
-    # Accept incoming client connections
+
     while True:
         # Accept incoming client connections
         client_socket, client_address = server_socket.accept()
+       
+       # fork the process 
+        process = os.fork()
         
-        # Handle each client connection in a new thread
-        client_thread = threading.Thread(target=handle_client, args=(client_socket, client_address))
-        client_thread.start()
+        # handle client in child process
+        if process == 0:  
+            # no longer need server socket
+            server_socket.close() 
+            handle_client(client_socket, client_address)
+            # exit process when connection terminated
+            os._exit(0) 
+        else:
+            # close socket socket in parent, client is running on child 
+            client_socket.close()
 
 if __name__ == "__main__":
      start_server()

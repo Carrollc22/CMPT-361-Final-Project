@@ -202,6 +202,6 @@ def start_client(server_ip, server_port):
 
 # run client
 if __name__ == "__main__":
-    server_ip = "127.0.0.1"
+    server_ip = input("Enter the server ip: ")
     server_port = 13000
     start_client(server_ip, server_port)
