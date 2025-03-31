@@ -11,7 +11,7 @@ import json
 import os
 
 
-MENU = "Select the operation:\n1) Create and send an email\n2) Display the inbox list\n3) Display the email contents\n4) Terminate the connection\nchoice:"
+MENU = "\nSelect the operation:\n1) Create and send an email\n2) Display the inbox list\n3) Display the email contents\n4) Terminate the connection\nchoice:"
 received_nonces = []
 
 
@@ -206,7 +206,7 @@ def handle_send_email(client_socket, sym_key, username):
 # return: sorted_emails. The list of emails sorted by date and time
 def handle_sort_emails(username):
 
-    # Server: Fetch inbox path (using the capitalized username)
+    # Fetch inbox path (using the capitalized username)
     inbox_path = f'Server/{username}/'
 
     # Check if the inbox exists for the client
@@ -259,7 +259,7 @@ def handle_view_inbox(client_socket, sym_key, username):
     # Get sorted emails
     sorted_emails = handle_sort_emails(username)
    
-    # Server: Fetch inbox path (using the capitalized username)
+    # Fetch inbox path (using the capitalized username)
     inbox_path = f'Server/{username}/'
 
 

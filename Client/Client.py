@@ -13,7 +13,7 @@ import os
 # returns: formatted_email
 def format_email(username):
     # user input
-    destinations = input("Enter destinations (separated by ;): ")
+    destinations = input("\nEnter destinations (separated by ;): ")
     title = input("Enter title: ")
     file_load = input("Would you like to load contents from a file?(Y/N): ")
     while((file_load != "Y") and (file_load != "N")):
@@ -122,7 +122,7 @@ def send_email_subprotocol(client_socket, sym_key, username):
     client_socket.send(encrypted_email)
    
     # email has been sent
-    print("The message is sent to the server.")
+    print("\nThe message is sent to the server.")
 
 
 # view_inbox_subprotocol
@@ -130,7 +130,7 @@ def send_email_subprotocol(client_socket, sym_key, username):
 # params: client_socket, sym_key
 # return: none
 def view_inbox_subprotocol(client_socket, sym_key):
-        # Client Side: Receive the encrypted inbox list
+        # Receive the encrypted inbox list
     encrypted_inbox = client_socket.recv(1024)
 
 
@@ -140,7 +140,7 @@ def view_inbox_subprotocol(client_socket, sym_key):
 
     # Display the inbox list
     if decrypted_inbox == "":
-        print("No emails found in the inbox.")
+        print("\nNo emails found in the inbox.")
     else:
         print(decrypted_inbox)
 
@@ -152,7 +152,7 @@ def view_inbox_subprotocol(client_socket, sym_key):
 # params: client_socket, sym_key
 # return: none
 def view_email_subprotocol(client_socket, sym_key):
-        # Client Side: Receive the encrypted email content
+        # Receive the encrypted email content
     encrypted_request = client_socket.recv(1024)
 
 
@@ -256,7 +256,7 @@ def start_client(server_ip, server_port):
                 view_email_subprotocol(client_socket, sym_key)
                  
             elif choice == '4':
-                print("The connection is terminated with the server.")
+                print("\nThe connection is terminated with the server.\n")
                 break
             else:
                 print("Invalid choice. Please try again.")
