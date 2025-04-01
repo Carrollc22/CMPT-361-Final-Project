@@ -1,14 +1,19 @@
-import socket 
+import socket
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
 from Crypto.Util.Padding import pad
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
+from Crypto.Random import get_random_bytes
+import datetime
 import json
+import sys
 import os
 
-<<<<<<< Updated upstream
-=======
+
+
+
+
 # format_email
 # get user input and format email to send
 # param: username
@@ -20,7 +25,7 @@ def format_email(username):
     file_load = input("Would you like to load contents from a file?(Y/N): ")
     while((file_load != "Y") and (file_load != "N")):
         file_load = input("Invalid Choice. Would you like to load contents from a file?(Y/N): ")
-    
+   
     # Get message from existing file
     if file_load == "Y":
         send_file = input("Enter filename: ")
@@ -29,11 +34,13 @@ def format_email(username):
             send_file = input("Not an existing file. Enter filename: ")
         with open(f"Client/{send_file}", 'r') as file:
                 send_content = file.read()
-    
+   
     elif file_load == "N":
         send_content = input("Enter message contents: ")
 
+
     content_length = len(send_content)
+
 
     # format
     message = f"From: {username}\n" \
@@ -42,7 +49,7 @@ def format_email(username):
               f"Content Length: {content_length}\n" \
               f"Content: {send_content}"
     return message
->>>>>>> Stashed changes
+
 # load_key
 # save the key to a variable from a .pem file
 # param: key_file. The file containing the key
@@ -55,28 +62,36 @@ def load_key(pem_file):
     return key
 
 # encryptionRSA
-# encrypt the message with RSA for assymetric keys
+# encrypt the message with RSA for assymetric keys generate nonce to send to server
 # params: data, public_key
-# return: encryped_data
+# return: encryped_data + nonce
 def encryptionRSA(data, public_key):
+    # generate nonce to send
+    nonce = get_random_bytes(16)
+
+    print(f"Nonce generated, sending with message: {nonce}")
     # init cipher with public key
     cipher_rsa = PKCS1_OAEP.new(public_key)
-    
+   
     # encrypt data with cipher
     encrypted_data = cipher_rsa.encrypt(data)
-    
-    return encrypted_data
+   
+    return nonce + encrypted_data
+
 
 # encryptionAES
-# encrypt the message with AES for symmetric keys
+# encrypt the message with AES for symmetric keys generate nonce to send to server
 # params: data, sym_key
-# returns: encrypted_data
+# returns: encrypted_data + nonce
 def encryptionAES(data, sym_key):
+    # Generate nonce to send
+    nonce = get_random_bytes(16)
+    print(f"Nonce generated, sending with message: {nonce}")
     padded_data = pad(data, AES.block_size)
-    
+   
     cipher = AES.new(sym_key, AES.MODE_ECB)
     encrypted_data = cipher.encrypt(padded_data)
-    return encrypted_data
+    return nonce + encrypted_data
 
 # decryptionRSA
 # decrypt the incoming message with rsa
@@ -85,11 +100,12 @@ def encryptionAES(data, sym_key):
 def decryptionRSA(encrypted_data, private_key):
     # Init cipher with private key
     cipher_rsa = PKCS1_OAEP.new(private_key)
-    
+   
     # Decrypt data
     decrypted_data = cipher_rsa.decrypt(encrypted_data)
-    
+   
     # return decoded data
+    unpadded_data = unpad(decrypted_data, AES.block_size)
     return decrypted_data.decode('utf-8')
 
 # decryptionAES
@@ -97,18 +113,17 @@ def decryptionRSA(encrypted_data, private_key):
 # Parameters: encrypted_data, key
 # Returns: unpadded_data.decoode
 def decryptionAES(encrypted_data, sym_key):
-    # init cipher 
+    # init cipher
     cipher = AES.new(sym_key, AES.MODE_ECB)
+
 
     # decrypt
     decrypted_data = cipher.decrypt(encrypted_data)
-    
+   
     #unpad
     unpadded_data = unpad(decrypted_data, AES.block_size)
     return unpadded_data.decode('utf-8')
 
-<<<<<<< Updated upstream
-=======
 # send_email_subprotocol
 # send the email to the server
 # params: client_socket, sym_key, username
@@ -188,23 +203,27 @@ def view_email_subprotocol(client_socket, sym_key):
     else:
         print("Unexpected server response: " + request)
 
->>>>>>> Stashed changes
+
 # start_client
 # connects to server through known server ip and port
-# params: server_ip, server_port. known ip and port addresses to start connection 
+# params: server_ip, server_port. known ip and port addresses to start connection
 # return: none
 def start_client(server_ip, server_port):
     # get the server public key form server_public key file
     pem_file = "Client/server_public.pem"
     key = load_key(pem_file)
 
+
     # config socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
 
     # Connect to the server
     client_socket.connect((server_ip, server_port))
 
+
     client_socket.recv(1024).decode()
+
 
     # login block
     username = input("Enter your username: ")
@@ -212,7 +231,7 @@ def start_client(server_ip, server_port):
     data = (username + "," + password).encode('utf-8')
     encrypted_creds = encryptionRSA(data, key)
     client_socket.send(encrypted_creds)
-    
+   
     # check if valid login
     response = client_socket.recv(1024).decode()
     if response == "Invalid username or password":
@@ -220,9 +239,10 @@ def start_client(server_ip, server_port):
         print("Terminating.")
         client_socket.close()
         return
-    
+   
     # receive encrypted key
     encrypted_sym_key = client_socket.recv(1024)
+
 
     # load client's private key and decrypt sym_key
     client_private_file = f"Client/{username}_private.pem"
@@ -241,47 +261,36 @@ def start_client(server_ip, server_port):
              
             # decrypt and display menu
             menu = decryptionAES(encrypted_menu, sym_key)
-            print(menu, end="")
+            print(menu, end=" ", flush = True)
              
             # get user choice
+            sys.stdin.flush()
+            sys.stdout.flush()
             choice = input()
              
             # encrypt and send choice
             encrypted_choice = encryptionAES(choice.encode("utf-8"), sym_key)
             client_socket.send(encrypted_choice)
              
-             
+            # Call function based on user choice
             if choice == '1':
-                print("Sending email subprotocol")
-                 
+                send_email_subprotocol(client_socket, sym_key, username)
+ 
             elif choice == '2':
-<<<<<<< Updated upstream
-                print("Viewing inbox subprotocol")
-                 
-            elif choice == '3':
- 
-                # IMPLEMENT VIEW EMAIL SUBPROTOCOL
-                 
-                print("Viewing email subprotocol")
-                 
-            elif choice == '4':
-                print("The connection is terminated with the server.")
-=======
                 view_inbox_subprotocol(client_socket, sym_key)
-                 
+
+
             elif choice == '3':
- 
                 view_email_subprotocol(client_socket, sym_key)
-                 
+
+
             elif choice == '4':
-                print("\nThe connection is terminated with the server.\n")
->>>>>>> Stashed changes
+                print("\nThe connection with the server has been terminated.\n")
                 break
-            else:
-                print("Invalid choice. Please try again.")
                  
     # Close the client socket
     client_socket.close()
+
 
 # run client
 if __name__ == "__main__":
