@@ -12,8 +12,15 @@ import os
 
 
 MENU = "Select the operation:\n1) Create and send an email\n2) Display the inbox list\n3) Display the email contents\n4) Terminate the connection\nchoice:"
-received_nonces = []
 
+# is_nonce_in_file
+# check if nonce is in file. if it is in file return true else false
+# param: nonce
+# returns: True or False
+def is_nonce_in_file(nonce):
+    with open("Server/nonces.txt", "rb") as f:
+        nonces = f.read().splitlines()
+    return nonce in nonces
 
 # handle_received_email
 # split the received email into individual components, print confirmation message, and add timestamp
@@ -93,13 +100,15 @@ def decryptionRSA(encrypted_data, private_key):
     nonce = encrypted_data[:16]  
     print(f"Nonce received: {nonce}")
     # check nonce
-    if nonce in received_nonces:
+    if is_nonce_in_file(nonce):
         print("Nonce is not unique, terminating")
         return "playback attack detected"
     else:
-        received_nonces.append(nonce)
-        print("Nonce verified as unique")
-
+        with open("Server/nonces.txt", "ab") as f:
+            f.write(nonce)
+        with open("Server/nonces.txt", "a") as f:
+            f.write("\n")
+        print("Nonce verified as unique added to received nonces")
 
     encrypted_message = encrypted_data[16:]
 
@@ -122,13 +131,18 @@ def decryptionAES(encrypted_data, sym_key):
     # extract nonce from message
     nonce = encrypted_data[:16]  
     print(f"Nonce received: {nonce}")
-    # check nonce
-    if nonce in received_nonces:
+    # check if nonce is unique
+    if is_nonce_in_file(nonce):
         print("Nonce is not unique, terminating")
         return "playback attack detected"
     else:
-        received_nonces.append(nonce)
-        print("Nonce verified as unique")
+        with open("Server/nonces.txt", "ab") as f:
+            f.write(nonce)
+        with open("Server/nonces.txt", "a") as f:
+            f.write("\n")
+        print("Nonce verified as unique added to received nonces")
+
+
     encrypted_message = encrypted_data[16:]
 
 

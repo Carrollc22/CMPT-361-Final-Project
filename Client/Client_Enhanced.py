@@ -69,6 +69,7 @@ def load_key(pem_file):
 def encryptionRSA(data, public_key):
     # generate nonce to send
     nonce = get_random_bytes(16)
+
     print(f"Nonce generated, sending with message: {nonce}")
     # init cipher with public key
     cipher_rsa = PKCS1_OAEP.new(public_key)
