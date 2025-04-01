@@ -496,7 +496,7 @@ def start_server():
        # fork the process 
         process = os.fork()
 
-        # handle client in child process
+        # handle client in child process 
         if process == 0:  
             # no longer need server socket
             server_socket.close() 

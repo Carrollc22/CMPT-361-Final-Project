@@ -17,7 +17,7 @@ MENU = "Select the operation:\n1) Create and send an email\n2) Display the inbox
 # param: recv_email
 # return: formatted_email, destinations, title
 def handle_received_email(recv_email):
-    # split by each line
+    # split by each line 
     lines = recv_email.splitlines()
     
     # get components

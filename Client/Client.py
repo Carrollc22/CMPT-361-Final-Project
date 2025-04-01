@@ -4,7 +4,6 @@ from Crypto.Util.Padding import unpad
 from Crypto.Util.Padding import pad
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
-import json
 import os
 
 # format_email

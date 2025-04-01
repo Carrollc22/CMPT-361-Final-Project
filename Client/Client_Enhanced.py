@@ -5,15 +5,8 @@ from Crypto.Util.Padding import pad
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Random import get_random_bytes
-import datetime
-import json
 import sys
 import os
-
-
-
-
-
 
 # format_email
 # get user input and format email to send
