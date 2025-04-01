@@ -6,15 +6,10 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
+import datetime
 import json
 import os
 
-<<<<<<< Updated upstream
-
-MENU = "Select the operation:\n1) Create and send an email\n2) Display the inbox list\n3) Display the email contents\n4) Terminate the connection\nchoice: "
- 
- 
-=======
 MENU = "\nSelect the operation:\n1) Create and send an email\n2) Display the inbox list\n3) Display the email contents\n4) Terminate the connection\nchoice: "
 
 # handle_received_email
@@ -47,7 +42,6 @@ def handle_received_email(recv_email):
                       f"{content}"
     return formatted_email, destinations, title
 
->>>>>>> Stashed changes
 # load_key
 # save the key to a variable from a .pem file
 # param: key_file. The file containing the key
@@ -138,8 +132,6 @@ def get_server_ip():
     s.close()
     return server_ip
 
-<<<<<<< Updated upstream
-=======
 # handle_send_email
 # send the email to the server
 # params: client_socket, sym_key, username
@@ -298,7 +290,6 @@ def handle_view_email(client_socket, sym_key, username):
 
 
 
->>>>>>> Stashed changes
 # handle_client
 # process of handling client connection. calls subprotocols to handle client requests.
 # parameters: client_socket. The socket connection between server and client.
@@ -365,37 +356,17 @@ def handle_client(client_socket, client_address):
         choice = decryptionAES(encrypted_choice, sym_key)
  
         if choice == '1':
-<<<<<<< Updated upstream
-                     
-                # IMPLEMENT SEND EMAIL SUBPROTOCOL
- 
-                print(f"Client {username} selected: Send email")
-                     
-                     
-        elif choice == '2':
- 
-            # IMPLEMENT VIEW INBOX SUBPROTOCOL
- 
-            print(f"Client {username} selected: View inbox")
-=======
             handle_send_email(client_socket, sym_key, username)    
                 
           
         elif choice == '2':
  
             handle_view_inbox(client_socket, sym_key, username)
->>>>>>> Stashed changes
                  
                  
         elif choice == '3':
  
-<<<<<<< Updated upstream
-            # IMPLEMENT VIEW EMAIL SUBPROTOCOL
- 
-            print(f"Client {username} selected: View email content")
-=======
             handle_view_email(client_socket, sym_key, username)
->>>>>>> Stashed changes
                  
                  
         elif choice == '4':

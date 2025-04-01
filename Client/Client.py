@@ -7,8 +7,6 @@ from Crypto.Cipher import PKCS1_OAEP
 import json
 import os
 
-<<<<<<< Updated upstream
-=======
 # format_email
 # get user input and format email to send
 # param: username
@@ -42,7 +40,6 @@ def format_email(username):
               f"Content Length: {content_length}\n" \
               f"Content: {send_content}"
     return message
->>>>>>> Stashed changes
 # load_key
 # save the key to a variable from a .pem file
 # param: key_file. The file containing the key
@@ -107,8 +104,6 @@ def decryptionAES(encrypted_data, sym_key):
     unpadded_data = unpad(decrypted_data, AES.block_size)
     return unpadded_data.decode('utf-8')
 
-<<<<<<< Updated upstream
-=======
 # send_email_subprotocol
 # send the email to the server
 # params: client_socket, sym_key, username
@@ -188,7 +183,6 @@ def view_email_subprotocol(client_socket, sym_key):
     else:
         print("Unexpected server response: " + request)
 
->>>>>>> Stashed changes
 # start_client
 # connects to server through known server ip and port
 # params: server_ip, server_port. known ip and port addresses to start connection 
@@ -255,18 +249,6 @@ def start_client(server_ip, server_port):
                 print("Sending email subprotocol")
                  
             elif choice == '2':
-<<<<<<< Updated upstream
-                print("Viewing inbox subprotocol")
-                 
-            elif choice == '3':
- 
-                # IMPLEMENT VIEW EMAIL SUBPROTOCOL
-                 
-                print("Viewing email subprotocol")
-                 
-            elif choice == '4':
-                print("The connection is terminated with the server.")
-=======
                 view_inbox_subprotocol(client_socket, sym_key)
                  
             elif choice == '3':
@@ -275,7 +257,6 @@ def start_client(server_ip, server_port):
                  
             elif choice == '4':
                 print("\nThe connection is terminated with the server.\n")
->>>>>>> Stashed changes
                 break
             else:
                 print("Invalid choice. Please try again.")
