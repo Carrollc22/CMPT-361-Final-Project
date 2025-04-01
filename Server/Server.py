@@ -315,16 +315,8 @@ def handle_client(client_socket, client_address):
         sym_key = get_random_bytes(32)
         
         # get user public key for rsa
-        if username == "client1":
-            pem_file = "Server/Client1/client1_public.pem"
-        elif username == "client2":
-            pem_file = "Server/Client2/client2_public.pem"
-        elif username == "client3":
-            pem_file = "Server/Client3/client3_public.pem"
-        elif username == "client4":
-            pem_file = "Server/Client4/client4_public.pem"
-        elif username == "client5":
-            pem_file = "Server/Client5/client5_public.pem"
+        pem_file = f"Server/{username}/{username}_public.pem"
+
         key = load_key(pem_file)
 
         # success 
@@ -354,7 +346,7 @@ def handle_client(client_socket, client_address):
         # receive encrypted choice from client
         encrypted_choice = client_socket.recv(1024)
         choice = decryptionAES(encrypted_choice, sym_key)
- 
+    
         if choice == '1':
             handle_send_email(client_socket, sym_key, username)    
                 

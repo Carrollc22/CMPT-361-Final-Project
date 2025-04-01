@@ -246,8 +246,8 @@ def start_client(server_ip, server_port):
              
              
             if choice == '1':
-                print("Sending email subprotocol")
-                 
+                send_email_subprotocol(client_socket, sym_key, username)
+  
             elif choice == '2':
                 view_inbox_subprotocol(client_socket, sym_key)
                  
