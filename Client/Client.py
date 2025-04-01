@@ -121,7 +121,7 @@ def send_email_subprotocol(client_socket, sym_key, username):
     client_socket.send(encrypted_email)
    
     # email has been sent
-    print("The message is sent to the server.")
+    print("\nThe message is sent to the server.")
 
 
 # view_inbox_subprotocol
@@ -129,7 +129,8 @@ def send_email_subprotocol(client_socket, sym_key, username):
 # params: client_socket, sym_key
 # return: none
 def view_inbox_subprotocol(client_socket, sym_key):
-        # Client Side: Receive the encrypted inbox list
+
+        # Receive the encrypted inbox list
     encrypted_inbox = client_socket.recv(1024)
 
 
@@ -139,7 +140,7 @@ def view_inbox_subprotocol(client_socket, sym_key):
 
     # Display the inbox list
     if decrypted_inbox == "":
-        print("No emails found in the inbox.")
+        print("\nNo emails found in the inbox.")
     else:
         print(decrypted_inbox)
 
@@ -255,7 +256,7 @@ def start_client(server_ip, server_port):
                 view_email_subprotocol(client_socket, sym_key)
                  
             elif choice == '4':
-                print("The connection is terminated with the server.")
+                print("\nThe connection is terminated with the server.\n")
                 break
             else:
                 print("Invalid choice. Please try again.")

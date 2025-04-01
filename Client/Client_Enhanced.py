@@ -8,13 +8,15 @@ from Crypto.Random import get_random_bytes
 import sys
 import os
 
+
+
 # format_email
 # get user input and format email to send
 # param: username
 # returns: formatted_email
 def format_email(username):
     # user input
-    destinations = input("Enter destinations (separated by ;): ")
+    destinations = input("\nEnter destinations (separated by ;): ")
     title = input("Enter title: ")
     file_load = input("Would you like to load contents from a file?(Y/N): ")
     while((file_load != "Y") and (file_load != "N")):
@@ -136,7 +138,8 @@ def send_email_subprotocol(client_socket, sym_key, username):
     client_socket.send(encrypted_email)
    
     # email has been sent
-    print("The message is sent to the server.")
+    print("\nThe message is sent to the server.")
+
 
 
 # view_inbox_subprotocol
@@ -154,7 +157,7 @@ def view_inbox_subprotocol(client_socket, sym_key):
 
     # Display the inbox list
     if decrypted_inbox == "":
-        print("No emails found in the inbox.")
+        print("\nNo emails found in the inbox.")
     else:
         print(decrypted_inbox)
 
@@ -279,7 +282,7 @@ def start_client(server_ip, server_port):
 
 
             elif choice == '4':
-                print("The connection with the server has been terminated.")
+                print("\nThe connection with the server has been terminated.\n")
                 break
                  
     # Close the client socket

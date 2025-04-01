@@ -10,7 +10,7 @@ import datetime
 import json
 import os
 
-MENU = "Select the operation:\n1) Create and send an email\n2) Display the inbox list\n3) Display the email contents\n4) Terminate the connection\nchoice: "
+MENU = "\nSelect the operation:\n1) Create and send an email\n2) Display the inbox list\n3) Display the email contents\n4) Terminate the connection\nchoice: "
 
 # handle_received_email
 # split the received email into individual components, print confirmation message, and add timestamp
@@ -195,7 +195,8 @@ def handle_sort_emails(username):
                 elif line.startswith("Title:"):
                     title = line[line.find(":")+1:].strip()
 
-            sorted_emails = sorted_emails[::-1]
+            # Sort by date and time
+            sorted_emails = sorted(sorted_emails, key=lambda x: x[0])
             
             # Append to sorted_emails list
             sorted_emails.append([date_time, sender, title, file])

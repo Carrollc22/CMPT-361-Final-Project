@@ -11,7 +11,7 @@ import json
 import os
 
 
-MENU = "Select the operation:\n1) Create and send an email\n2) Display the inbox list\n3) Display the email contents\n4) Terminate the connection\nchoice:"
+MENU = "\nSelect the operation:\n1) Create and send an email\n2) Display the inbox list\n3) Display the email contents\n4) Terminate the connection\nchoice:"
 
 # is_nonce_in_file
 # check if nonce is in file. if it is in file return true else false
