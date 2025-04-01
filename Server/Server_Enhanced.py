@@ -13,7 +13,6 @@ import os
 
 MENU = "\nSelect the operation:\n1) Create and send an email\n2) Display the inbox list\n3) Display the email contents\n4) Terminate the connection\nchoice:"
 
-
 # is_nonce_in_file
 # check if nonce is in file. if it is in file return true else false
 # param: nonce
@@ -227,7 +226,7 @@ def handle_send_email(client_socket, sym_key, username):
 # return: sorted_emails. The list of emails sorted by date and time
 def handle_sort_emails(username):
 
-    # Fetch inbox path (using the capitalized username)
+    # Server: Fetch inbox path (using the capitalized username)
     inbox_path = f'Server/{username}/'
 
     # Check if the inbox exists for the client
@@ -280,7 +279,7 @@ def handle_view_inbox(client_socket, sym_key, username):
     # Get sorted emails
     sorted_emails = handle_sort_emails(username)
    
-    # Fetch inbox path (using the capitalized username)
+    # Server: Fetch inbox path (using the capitalized username)
     inbox_path = f'Server/{username}/'
 
 
@@ -497,7 +496,7 @@ def start_server():
        # fork the process 
         process = os.fork()
 
-        # handle client in child process
+        # handle client in child process 
         if process == 0:  
             # no longer need server socket
             server_socket.close() 

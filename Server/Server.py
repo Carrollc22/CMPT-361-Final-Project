@@ -17,7 +17,7 @@ MENU = "\nSelect the operation:\n1) Create and send an email\n2) Display the inb
 # param: recv_email
 # return: formatted_email, destinations, title
 def handle_received_email(recv_email):
-    # split by each line
+    # split by each line 
     lines = recv_email.splitlines()
     
     # get components
@@ -163,7 +163,7 @@ def handle_send_email(client_socket, sym_key, username):
 # return: sorted_emails. The list of emails sorted by date and time
 def handle_sort_emails(username):
 
-    # Fetch inbox path (using the capitalized username)
+    # Server: Fetch inbox path (using the capitalized username)
     inbox_path = f'Server/{username}'
 
     # Check if the inbox exists for the client
@@ -212,7 +212,7 @@ def handle_view_inbox(client_socket, sym_key, username):
     # Get sorted emails
     sorted_emails = handle_sort_emails(username)
     
-    # Fetch inbox path (using the capitalized username)
+    # Server: Fetch inbox path (using the capitalized username)
     inbox_path = f'Server/{username}'
 
     # Check if the inbox exists for the client

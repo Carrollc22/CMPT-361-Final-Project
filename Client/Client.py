@@ -4,7 +4,6 @@ from Crypto.Util.Padding import unpad
 from Crypto.Util.Padding import pad
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
-import json
 import os
 
 # format_email
@@ -13,7 +12,7 @@ import os
 # returns: formatted_email
 def format_email(username):
     # user input
-    destinations = input("\nEnter destinations (separated by ;): ")
+    destinations = input("Enter destinations (separated by ;): ")
     title = input("Enter title: ")
     file_load = input("Would you like to load contents from a file?(Y/N): ")
     while((file_load != "Y") and (file_load != "N")):
@@ -130,6 +129,7 @@ def send_email_subprotocol(client_socket, sym_key, username):
 # params: client_socket, sym_key
 # return: none
 def view_inbox_subprotocol(client_socket, sym_key):
+
         # Receive the encrypted inbox list
     encrypted_inbox = client_socket.recv(1024)
 
@@ -152,7 +152,7 @@ def view_inbox_subprotocol(client_socket, sym_key):
 # params: client_socket, sym_key
 # return: none
 def view_email_subprotocol(client_socket, sym_key):
-        # Receive the encrypted email content
+        # Client Side: Receive the encrypted email content
     encrypted_request = client_socket.recv(1024)
 
 

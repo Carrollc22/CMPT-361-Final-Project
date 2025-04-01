@@ -5,12 +5,8 @@ from Crypto.Util.Padding import pad
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Random import get_random_bytes
-import datetime
-import json
 import sys
 import os
-
-
 
 
 
@@ -145,12 +141,13 @@ def send_email_subprotocol(client_socket, sym_key, username):
     print("\nThe message is sent to the server.")
 
 
+
 # view_inbox_subprotocol
 # view the inbox list from the server
 # params: client_socket, sym_key
 # return: none
 def view_inbox_subprotocol(client_socket, sym_key):
-        # Receive the encrypted inbox list
+        # Client Side: Receive the encrypted inbox list
     encrypted_inbox = client_socket.recv(1024)
 
 
@@ -172,7 +169,7 @@ def view_inbox_subprotocol(client_socket, sym_key):
 # params: client_socket, sym_key
 # return: none
 def view_email_subprotocol(client_socket, sym_key):
-        # Receive the encrypted email content
+        # Client Side: Receive the encrypted email content
     encrypted_request = client_socket.recv(1024)
 
 
